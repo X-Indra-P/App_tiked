@@ -7,14 +7,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 
-
-
-class SignUpform extends StatefulWidget {
+class SignUpForm extends StatefulWidget {
   @override
-  _SignUpform createState() => _SignUpform();
+  _SignUpFormState createState() => _SignUpFormState();
 }
 
-class _SignUpform extends State<SignUpform> {
+class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
   String? namalengkap;
   String? username;
@@ -22,44 +20,38 @@ class _SignUpform extends State<SignUpform> {
   String? password;
   bool? remember = false;
 
-  TextEditingController txtNamaLengkap = TextEditingController(),
-      txtUserName = TextEditingController(),
-      txtEmail = TextEditingController(),
-      txtPassword = TextEditingController();
-
-  FocusNode focusNode = new FocusNode();
-
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  FocusNode focusNode = FocusNode();
 
   final dio = Dio();
   final myStorage = GetStorage();
   final apiUrl = 'https://mobileapis.manpits.xyz/api';
 
-
-
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
       child: Column(
         children: [
           buildNamaLengkap(),
           SizedBox(height: getProportionateScreenHeight(30)),
-          buildUserName(),
-          SizedBox(height: getProportionateScreenHeight(30)),
           buildEmail(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildPassword(),
           SizedBox(height: getProportionateScreenHeight(30)),
           DefaultButtonCustomeColor(
             color: kPrimaryColor,
             text: "Register",
             press: () {
-              goRegister(context, dio, myStorage, apiUrl, nameController, emailController, passwordController);
+              if (_formKey.currentState!.validate()) {
+                goRegister(context, dio, myStorage, apiUrl, nameController, emailController, passwordController);
+              }
             },
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           GestureDetector(
             onTap: () {
               Navigator.pushNamed(context, LoginScreens.routeName);
@@ -68,7 +60,7 @@ class _SignUpform extends State<SignUpform> {
               "Sudah Punya Akun? Masuk Disini",
               style: TextStyle(decoration: TextDecoration.underline),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -80,52 +72,77 @@ class _SignUpform extends State<SignUpform> {
       keyboardType: TextInputType.text,
       style: mTitleStyle,
       decoration: InputDecoration(
-          labelText: 'Nama Lengkap',
-          hintText: 'Masukan Nama Lengkap',
-          labelStyle: TextStyle(
-              color: focusNode.hasFocus ? mSubtitleColor : kPrimaryColor),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          suffixIcon: CustomSurffixIcon(
-            svgIcon: "assets/icons/User.svg",
-          )),
-    );
-  }
-
-  TextFormField buildUserName() {
-    return TextFormField(
-      controller: emailController,
-      style: mTitleStyle,
-      decoration: InputDecoration(
-          labelText: 'Email',
-          hintText: 'Masukan Email',
-          labelStyle: TextStyle(
-              color: focusNode.hasFocus ? mSubtitleColor : kPrimaryColor),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          suffixIcon: CustomSurffixIcon(
-            svgIcon: "assets/icons/account.svg",
-          )),
+        labelText: 'Nama Lengkap',
+        hintText: 'Masukan Nama Lengkap',
+        labelStyle: TextStyle(color: focusNode.hasFocus ? mSubtitleColor : kPrimaryColor),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(
+          svgIcon: "assets/icons/User.svg",
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Masukkan nama lengkap Anda';
+        }
+        return null;
+      },
     );
   }
 
   TextFormField buildEmail() {
     return TextFormField(
-      controller: passwordController,
-      keyboardType: TextInputType.text,
+      controller: emailController,
+      keyboardType: TextInputType.emailAddress,
       style: mTitleStyle,
       decoration: InputDecoration(
-          labelText: 'Password',
-          hintText: 'Masukan Password',
-          labelStyle: TextStyle(
-              color: focusNode.hasFocus ? mSubtitleColor : kPrimaryColor),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          suffixIcon: CustomSurffixIcon(
-            svgIcon: "assets/icons/Mail.svg",
-          )),
+        labelText: 'Email',
+        hintText: 'Masukan Email',
+        labelStyle: TextStyle(color: focusNode.hasFocus ? mSubtitleColor : kPrimaryColor),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(
+          svgIcon: "assets/icons/Mail.svg",
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Masukkan email Anda';
+        }
+        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+          return 'Masukkan email yang valid';
+        }
+        return null;
+      },
+    );
+  }
+
+  TextFormField buildPassword() {
+    return TextFormField(
+      controller: passwordController,
+      obscureText: true,
+      style: mTitleStyle,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        hintText: 'Masukan Password',
+        labelStyle: TextStyle(color: focusNode.hasFocus ? mSubtitleColor : kPrimaryColor),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(
+          svgIcon: "assets/icons/Lock.svg",
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Masukkan password Anda';
+        }
+        if (value.length < 6) {
+          return 'Password harus terdiri dari minimal 6 karakter';
+        }
+        return null;
+      },
     );
   }
 }
 
-// fungsi register
+// Fungsi register
 void goRegister(BuildContext context, dio, myStorage, apiUrl, nameController,
     emailController, passwordController) async {
   try {
@@ -136,8 +153,8 @@ void goRegister(BuildContext context, dio, myStorage, apiUrl, nameController,
     });
     print(response.data);
 
-    // pindah ke login
-    
+    // Pindah ke halaman login
+    Navigator.pushNamed(context, LoginScreens.routeName);
   } on DioException catch (e) {
     print('${e.response} - ${e.response?.statusCode}');
   }

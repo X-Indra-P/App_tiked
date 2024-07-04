@@ -1,9 +1,8 @@
 import 'package:app_tiked/components/Login/loginform.dart';
 import 'package:app_tiked/size_config.dart';
 import 'package:app_tiked/utils/constants.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
+
 import 'package:simple_shadow/simple_shadow.dart';
 
 class LoginComponent extends StatefulWidget {
@@ -58,7 +57,7 @@ class _LoginComponentState extends State<LoginComponent> {
                     SizedBox(
                       height: 20,
                       ),
-                      SinginForm()
+                      SignInForm()
                 ],
               ),
               ),

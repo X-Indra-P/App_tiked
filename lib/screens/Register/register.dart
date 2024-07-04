@@ -1,8 +1,6 @@
 import 'package:app_tiked/components/Register/registercomponent.dart';
 import 'package:app_tiked/size_config.dart';
-import 'package:app_tiked/utils/constants.dart';
 import 'package:flutter/material.dart';
-
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -16,9 +14,18 @@ class RegisterScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.blue.shade100,
       ),
-      backgroundColor: kFourthColor,
-      body: RegisterComponent(),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: RegisterComponent(),
+      ),
     );
   }
 }

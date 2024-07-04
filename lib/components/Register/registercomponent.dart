@@ -45,7 +45,7 @@ class _RegisterComponent extends State<RegisterComponent> {
                 SizedBox(
                   height: 20,
                 ),
-                SignUpform()
+                SignUpForm()
               ],
             ),
           ),

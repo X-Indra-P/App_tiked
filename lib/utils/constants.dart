@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
  
@@ -7,7 +7,7 @@ import '../size_config.dart';
 const kPrimaryColor = Color(0xFF074173);
 const kSecondaryColor = Color(0xFF1679AB);
 const kThirdColor = Color(0xFF5DEBD7);
-const kFourthColor = Color(0xFFC5FF95);
+const kFourthColor = Color(0xFFEEF7FF);
 const kPrimaryLightColor = Color(0xFFFFFAB7);
 const kColorTeal = Color(0xFF008080);
 const kColorTealSlow = Color(0xFF159897);

@@ -1,24 +1,18 @@
-import 'package:app_tiked/screens/User/edit_user.dart';
+import 'package:app_tiked/screens/User/add_transaksi.dart';
 import 'package:app_tiked/screens/User/homeuserscreen.dart';
+import 'package:app_tiked/screens/User/saldo_user.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 
-class ListUser extends StatelessWidget {
-  const ListUser({super.key});
+class ListTransaksi extends StatefulWidget {
+  const ListTransaksi({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return _ListUserScreen();
-  }
+  State<ListTransaksi> createState() => _ListTransaksiState();
 }
 
-class _ListUserScreen extends StatefulWidget {
-  @override
-  State<_ListUserScreen> createState() => _ListUserScreenState();
-}
-
-class _ListUserScreenState extends State<_ListUserScreen> {
+class _ListTransaksiState extends State<ListTransaksi> {
   final dio = Dio();
   final myStorage = GetStorage();
   final apiUrl = 'https://mobileapis.manpits.xyz/api';
@@ -30,10 +24,10 @@ class _ListUserScreenState extends State<_ListUserScreen> {
   @override
   void initState() {
     super.initState();
-    getUser();
+    getAnggota();
   }
 
-  void getUser() async {
+  void getAnggota() async {
     try {
       final response = await dio.get(
         '$apiUrl/anggota',
@@ -51,27 +45,21 @@ class _ListUserScreenState extends State<_ListUserScreen> {
     }
   }
 
-  void deleteUser(int id) async {
-    try {
-      final response = await dio.delete(
-        '$apiUrl/anggota/$id',
-        options: Options(
-          headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
-        ),
-      );
-
-      print(response.data);
-
-      getUser();
-    } on DioError catch (e) {
-      print('${e.response} - ${e.response?.statusCode}');
-    }
-  }
-
-  void editUser(Map<String, dynamic> user) {
+  void tambahTransaksi(Map<String, dynamic> user) async {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EditUser(user: user)),
+      MaterialPageRoute(
+        builder: (context) => AddTransaksi(user: user),
+      ),
+    );
+  }
+
+  void goSaldo(Map<String, dynamic> user) async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SaldoUser(user: user),
+      ),
     );
   }
 
@@ -91,7 +79,7 @@ class _ListUserScreenState extends State<_ListUserScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue.shade100,
-        title: const Text('List Anggota'),
+        title: const Text('List Transaksi Anggota'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -116,7 +104,7 @@ class _ListUserScreenState extends State<_ListUserScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             children: [
-              SizedBox(height: 10),
+              SizedBox(height: 20), // Adjusted the height
               TextField(
                 controller: searchController,
                 decoration: InputDecoration(
@@ -127,10 +115,10 @@ class _ListUserScreenState extends State<_ListUserScreen> {
                   filterUsers(value);
                 },
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20), // Adjusted the height
               Expanded(
                 child: filteredUsers.isEmpty
-                    ? Center(child: CircularProgressIndicator())
+                    ? const Center(child: CircularProgressIndicator())
                     : ListView.builder(
                         itemCount: filteredUsers.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -144,20 +132,20 @@ class _ListUserScreenState extends State<_ListUserScreen> {
                                 children: [
                                   TextButton(
                                     onPressed: () {
-                                      editUser(user);
+                                      tambahTransaksi(user);
                                     },
                                     child: const Text(
-                                      'Edit Anggota',
-                                      style: TextStyle(color: Colors.orange),
+                                      'Tambah Transaksi',
+                                      style: TextStyle(color: Colors.blue),
                                     ),
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      deleteUser(user);
+                                      goSaldo(user);
                                     },
                                     child: const Text(
-                                      'Hapus Anggota',
-                                      style: TextStyle(color: Colors.red),
+                                      'Lihat Saldo',
+                                      style: TextStyle(color: Colors.green),
                                     ),
                                   ),
                                 ],
