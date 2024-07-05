@@ -1,8 +1,11 @@
 import 'package:app_tiked/screens/User/homeuserscreen.dart';
+import 'package:app_tiked/screens/User/list_user.dart';
 import 'package:app_tiked/utils/constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart'; 
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class AddUser extends StatefulWidget {
   const AddUser({super.key});
@@ -72,8 +75,7 @@ class _AddUserState extends State<AddUser> {
                   focusedBorder: UnderlineInputBorder(
                     borderSide: const BorderSide(
                       color: Color(0xFF80DEEA),
-                      width: 2,
-                    ),
+                      width: 2),
                   ),
                 ),
               ),
@@ -94,8 +96,7 @@ class _AddUserState extends State<AddUser> {
                   focusedBorder: UnderlineInputBorder(
                     borderSide: const BorderSide(
                       color: Color(0xFF80DEEA),
-                      width: 2,
-                    ),
+                      width: 2),
                   ),
                 ),
               ),
@@ -116,8 +117,7 @@ class _AddUserState extends State<AddUser> {
                   focusedBorder: UnderlineInputBorder(
                     borderSide: const BorderSide(
                       color: Color(0xFF80DEEA),
-                      width: 2,
-                    ),
+                      width: 2),
                   ),
                 ),
               ),
@@ -138,10 +138,25 @@ class _AddUserState extends State<AddUser> {
                   focusedBorder: UnderlineInputBorder(
                     borderSide: const BorderSide(
                       color: Color(0xFF80DEEA),
-                      width: 2,
-                    ),
+                      width: 2),
                   ),
                 ),
+                onTap: () async {
+                  FocusScope.of(context).requestFocus(new FocusNode()); // To prevent keyboard from appearing
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1600),
+                    lastDate: DateTime.now(),
+                  );
+
+                  if (pickedDate != null) {
+                    String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+                    setState(() {
+                      tglLahirController.text = formattedDate;
+                    });
+                  }
+                },
               ),
               const SizedBox(
                 height: 20,
@@ -160,8 +175,7 @@ class _AddUserState extends State<AddUser> {
                   focusedBorder: UnderlineInputBorder(
                     borderSide: const BorderSide(
                       color: Color(0xFF80DEEA),
-                      width: 2,
-                    ),
+                      width: 2),
                   ),
                 ),
               ),
@@ -186,8 +200,7 @@ class _AddUserState extends State<AddUser> {
                   shape: RoundedRectangleBorder(
                     side: const BorderSide(
                       color: Color.fromARGB(255, 14, 95, 161),
-                      width: 2,
-                    ),
+                      width: 2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   backgroundColor: Color(0xFF80DEEA),
@@ -235,12 +248,32 @@ void addUser(
     );
     print(response.data);
 
-    // Pindah halaman ke home jika berhasil register
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => HomeUserScreen()),
-    );
+    // Show success dialog
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.success,
+      animType: AnimType.bottomSlide,
+      title: 'Success',
+      desc: 'User added successfully!',
+      btnOkOnPress: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ListUser()),
+        );
+      },
+    )..show();
   } on DioException catch (e) {
-    print('${e.response} - ${e.response?.statusCode}');
+    if (e.response?.statusCode == 405) { // Conflict status code
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.bottomSlide,
+        title: 'Error',
+        desc: 'Nomor Induk sudah ada.',
+        btnOkOnPress: () {},
+      )..show();
+    } else {
+      print('${e.response} - ${e.response?.statusCode}');
+    }
   }
 }

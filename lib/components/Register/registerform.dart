@@ -3,6 +3,7 @@ import 'package:app_tiked/components/default_button_custome_color.dart';
 import 'package:app_tiked/screens/Login/loginscreens.dart';
 import 'package:app_tiked/size_config.dart';
 import 'package:app_tiked/utils/constants.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -47,7 +48,7 @@ class _SignUpFormState extends State<SignUpForm> {
             text: "Register",
             press: () {
               if (_formKey.currentState!.validate()) {
-                goRegister(context, dio, myStorage, apiUrl, nameController, emailController, passwordController);
+                showWarningDialog(context, dio, myStorage, apiUrl, nameController, emailController, passwordController);
               }
             },
           ),
@@ -140,22 +141,47 @@ class _SignUpFormState extends State<SignUpForm> {
       },
     );
   }
-}
 
-// Fungsi register
-void goRegister(BuildContext context, dio, myStorage, apiUrl, nameController,
-    emailController, passwordController) async {
-  try {
-    final response = await dio.post('$apiUrl/register', data: {
-      'name': nameController.text,
-      'email': emailController.text,
-      'password': passwordController.text,
-    });
-    print(response.data);
+  void showWarningDialog(BuildContext context, Dio dio, GetStorage myStorage, String apiUrl, TextEditingController nameController, TextEditingController emailController, TextEditingController passwordController) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.warning,
+      animType: AnimType.bottomSlide,
+      title: 'Warning',
+      desc: 'Are you sure you want to register?',
+      btnCancelOnPress: () {},
+      btnOkOnPress: () {
+        goRegister(context, dio, myStorage, apiUrl, nameController, emailController, passwordController);
+      },
+    )..show();
+  }
 
-    // Pindah ke halaman login
-    Navigator.pushNamed(context, LoginScreens.routeName);
-  } on DioException catch (e) {
-    print('${e.response} - ${e.response?.statusCode}');
+  void showSuccessDialog(BuildContext context) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.success,
+      animType: AnimType.bottomSlide,
+      title: 'Success',
+      desc: 'User created successfully!',
+      btnOkOnPress: () {
+        Navigator.pushNamed(context, LoginScreens.routeName);
+      },
+    )..show();
+  }
+
+  // Fungsi register
+  void goRegister(BuildContext context, Dio dio, GetStorage myStorage, String apiUrl, TextEditingController nameController,
+      TextEditingController emailController, TextEditingController passwordController) async {
+    try {
+      final response = await dio.post('$apiUrl/register', data: {
+        'name': nameController.text,
+        'email': emailController.text,
+        'password': passwordController.text,
+      });
+      print(response.data);
+      showSuccessDialog(context);
+    } on DioException catch (e) {
+      print('${e.response} - ${e.response?.statusCode}');
+    }
   }
 }

@@ -78,7 +78,7 @@ class _ListUserScreenState extends State<_ListUserScreen> {
   void filterUsers(String query) {
     setState(() {
       filteredUsers = users
-          .where((user) => user['nama']
+          .where((user) => user['nomor_induk']
               .toString()
               .toLowerCase()
               .contains(query.toLowerCase()))
@@ -130,7 +130,7 @@ class _ListUserScreenState extends State<_ListUserScreen> {
               SizedBox(height: 20),
               Expanded(
                 child: filteredUsers.isEmpty
-                    ? Center(child: CircularProgressIndicator())
+                    ? Center(child: Text('Tidak Ada Anggota'))
                     : ListView.builder(
                         itemCount: filteredUsers.length,
                         itemBuilder: (BuildContext context, int index) {
