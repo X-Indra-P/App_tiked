@@ -6,6 +6,7 @@ import 'package:app_tiked/screens/User/list_user.dart';
 import 'package:app_tiked/screens/User/profile.dart';
 import 'package:app_tiked/utils/constants.dart';
 import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
 
 class HomeUserScreen extends StatelessWidget {
   const HomeUserScreen({super.key});
@@ -113,7 +114,7 @@ class HomeUserScreen extends StatelessWidget {
                       icon: Icons.logout,
                       text: 'LogOut',
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, LoginScreens.routeName);
+                        goLogout(context);
                       },
                     ),
                   ],
@@ -187,6 +188,27 @@ class HomeUserScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void goLogout(BuildContext context) async {
+    final dio = Dio();
+    final myStorage = GetStorage();
+    final apiUrl = 'https://mobileapis.manpits.xyz/api';
+    try {
+      final response = await dio.get(
+        '$apiUrl/logout',
+        options: Options(
+          headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
+        ),
+      );
+      print(response.data);
+
+      myStorage.remove('token');
+
+      Navigator.pushReplacementNamed(context, LoginScreens.routeName);
+    } on DioError catch (e) {
+      print('${e.response} - ${e.response?.statusCode}');
+    }
   }
 }
 
@@ -263,26 +285,5 @@ class DashboardSection extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-void goLogout(BuildContext context, dio, myStorage, apiUrl) async {
-  try {
-    final response = await dio.get(
-      '$apiUrl/logout',
-      options: Options(
-        headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
-      ),
-    );
-    print(response.data);
-
-    myStorage.remove('token');
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreens()),
-    );
-  } on DioException catch (e) {
-    print('${e.response} - ${e.response?.statusCode}');
   }
 }

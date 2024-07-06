@@ -2,6 +2,7 @@ import 'package:app_tiked/screens/User/list_user.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class EditUser extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -38,33 +39,52 @@ class _EditUserState extends State<EditUser> {
   }
 
   void updateUser() async {
-    try {
-      final response = await dio.put(
-        '$apiUrl/anggota/${widget.user['id']}',
-        options: Options(
-          headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
-        ),
-        data: {
-          'nomor_induk': noIndukController.text,
-          'nama': namaController.text,
-          'alamat': alamatController.text,
-          'tgl_lahir': tglLahirController.text,
-          'telepon': teleponController.text,
-        },
-      );
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.info,
+      animType: AnimType.bottomSlide,
+      title: 'Konfirmasi',
+      desc: 'Apakah data yang disimpan sudah benar?',
+      btnCancelOnPress: () {},
+      btnOkOnPress: () async {
+        try {
+          final response = await dio.put(
+            '$apiUrl/anggota/${widget.user['id']}',
+            options: Options(
+              headers: {'Authorization': 'Bearer ${myStorage.read('token')}'},
+            ),
+            data: {
+              'nomor_induk': noIndukController.text,
+              'nama': namaController.text,
+              'alamat': alamatController.text,
+              'tgl_lahir': tglLahirController.text,
+              'telepon': teleponController.text,
+            },
+          );
 
-      print(response.data);
+          print(response.data);
 
-      // Pindah halaman ke home jika berhasil register
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ListUser(),
-        ),
-      );
-    } on DioException catch (e) {
-      print('${e.response} - ${e.response?.statusCode}');
-    }
+          // Show success dialog
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.success,
+            animType: AnimType.bottomSlide,
+            title: 'Success',
+            desc: 'Data berhasil diperbarui!',
+            btnOkOnPress: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ListUser(),
+                ),
+              );
+            },
+          ).show();
+        } on DioException catch (e) {
+          print('${e.response} - ${e.response?.statusCode}');
+        }
+      },
+    ).show();
   }
 
   @override
@@ -89,17 +109,18 @@ class _EditUserState extends State<EditUser> {
               const SizedBox(height: 5),
               TextField(
                 controller: noIndukController,
+                readOnly: true,
                 decoration: InputDecoration(
                   labelText: 'Nomor Induk',
                   labelStyle: const TextStyle(color: Colors.black),
-                  fillColor: const Color.fromARGB(255, 255, 255, 255),
+                  fillColor: const Color.fromARGB(128, 128, 128, 128),
                   filled: true,
                   contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: const BorderSide(color: Colors.black, width: 2),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: const BorderSide(color: Color(0xFF80DEEA), width: 2),
+                    borderSide: const BorderSide(color: Colors.black, width: 2),
                   ),
                 ),
               ),

@@ -1,6 +1,5 @@
 import 'package:app_tiked/screens/User/homeuserscreen.dart';
 import 'package:app_tiked/screens/User/list_user.dart';
-import 'package:app_tiked/utils/constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -43,7 +42,7 @@ class _AddUserState extends State<AddUser> {
         ),
         title: Text(
           'Tambahkan Data Anggota',
-          style: TextStyle(color: kFourthColor, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
       body: Container(
@@ -184,7 +183,7 @@ class _AddUserState extends State<AddUser> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  addUser(
+                  confirmAddUser(
                     context,
                     dio,
                     myStorage,
@@ -219,6 +218,40 @@ class _AddUserState extends State<AddUser> {
       ),
     );
   }
+}
+
+void confirmAddUser(
+  BuildContext context,
+  dio,
+  myStorage,
+  apiUrl,
+  noIndukController,
+  namaController,
+  alamatController,
+  tglLahirController,
+  teleponController,
+) {
+  AwesomeDialog(
+    context: context,
+    dialogType: DialogType.info,
+    animType: AnimType.bottomSlide,
+    title: 'Konfirmasi',
+    desc: 'Apakah data yang Anda masukan sudah benar?',
+    btnCancelOnPress: () {},
+    btnOkOnPress: () {
+      addUser(
+        context,
+        dio,
+        myStorage,
+        apiUrl,
+        noIndukController,
+        namaController,
+        alamatController,
+        tglLahirController,
+        teleponController,
+      );
+    },
+  )..show();
 }
 
 void addUser(

@@ -66,13 +66,14 @@ class _ListTransaksiState extends State<ListTransaksi> {
   void filterUsers(String query) {
     setState(() {
       filteredUsers = users
-          .where((user) => user['nama']
-              .toString()
-              .toLowerCase()
-              .contains(query.toLowerCase()))
+          .where((user) =>
+              user['nama'].toString().toLowerCase().contains(query.toLowerCase()) ||
+              user['nomor_induk'].toString().toLowerCase().contains(query.toLowerCase())||
+              user['tgl_lahir'].toString().toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +119,7 @@ class _ListTransaksiState extends State<ListTransaksi> {
               SizedBox(height: 20), // Adjusted the height
               Expanded(
                 child: filteredUsers.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const Center(child: Text('Tidak Ada Anggota'))
                     : ListView.builder(
                         itemCount: filteredUsers.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -134,18 +135,36 @@ class _ListTransaksiState extends State<ListTransaksi> {
                                     onPressed: () {
                                       tambahTransaksi(user);
                                     },
-                                    child: const Text(
-                                      'Tambah Transaksi',
-                                      style: TextStyle(color: Colors.blue),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Text(
+                                          'Tambah',
+                                          style: TextStyle(color: Colors.blue),
+                                        ),
+                                        Text(
+                                          'Transaksi',
+                                          style: TextStyle(color: Colors.blue),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   TextButton(
                                     onPressed: () {
                                       goSaldo(user);
                                     },
-                                    child: const Text(
-                                      'Lihat Saldo',
-                                      style: TextStyle(color: Colors.green),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Text(
+                                          'Lihat',
+                                          style: TextStyle(color: Colors.green),
+                                        ),
+                                        Text(
+                                          'Saldo',
+                                          style: TextStyle(color: Colors.green),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],

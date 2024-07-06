@@ -4,10 +4,28 @@ import 'package:app_tiked/screens/User/homeuserscreen.dart';
 import 'package:flutter/material.dart';
 
 final Map<String, WidgetBuilder> routes = {
-  //Login dan register
+  // Login and register
   LoginScreens.routeName: (context) => LoginScreens(),
-  RegisterScreen.routeName:(context) => RegisterScreen(),
+  RegisterScreen.routeName: (context) => RegisterScreen(),
 
   // User Screen
-  HomeUserScreen.routeName:(context) => HomeUserScreen() 
+  HomeUserScreen.routeName: (context) => HomeUserScreen(),
 };
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'App Tiket',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      initialRoute: LoginScreens.routeName,
+      routes: routes,
+    );
+  }
+}

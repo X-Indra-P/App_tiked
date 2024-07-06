@@ -1,7 +1,9 @@
 import 'package:app_tiked/screens/User/list_transaksi.dart';
+import 'package:app_tiked/screens/User/saldo_user.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class AddTransaksi extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -48,16 +50,56 @@ class _AddTransaksiState extends State<AddTransaksi> {
 
       print(response.data);
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ListTransaksi(),
-        ),
-      );
+      // Check the success status from API response
+      if (response.data['success'] == false) {
+        // Check specific error message from API response
+        if (response.data['message'] != null &&
+            response.data['message'].contains('saldo')) {
+          // Handle saldo tidak mencukupi dengan menampilkan dialog
+          showErrorDialog(response.data['message']);
+        } else {
+          // Handle other error cases
+          showErrorDialog(response.data['message']);
+        }
+      } else {
+        // Navigate to Saldo user if transaction is successful
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SaldoUser(user: widget.user,),
+          ),
+        );
+      }
     } catch (e) {
-      // Handle error
+      // Handle DioError or other exceptions
       print('Error: $e');
+      showErrorDialog('Terjadi kesalahan saat melakukan transaksi.');
     }
+  }
+
+  void showErrorDialog(String message) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.error,
+      animType: AnimType.bottomSlide,
+      title: 'Transaksi Gagal',
+      desc: message,
+      btnOkOnPress: () {},
+    ).show();
+  }
+
+  void showConfirmationDialog() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.warning,
+      animType: AnimType.bottomSlide,
+      title: 'Konfirmasi Transaksi',
+      desc: 'Anda yakin ingin melakukan transaksi?',
+      btnCancelOnPress: () {},
+      btnOkOnPress: () {
+        menuTransaksi(); // Panggil menuTransaksi jika pengguna menekan OK
+      },
+    ).show();
   }
 
   @override
@@ -97,7 +139,8 @@ class _AddTransaksiState extends State<AddTransaksi> {
               // Text field for displaying user's name
               TextFormField(
                 enabled: false,
-                controller: TextEditingController(text: widget.user['nama']),
+                controller:
+                    TextEditingController(text: widget.user['nama']),
                 decoration: const InputDecoration(
                   labelText: 'Nama Anggota',
                   labelStyle: TextStyle(
@@ -106,7 +149,8 @@ class _AddTransaksiState extends State<AddTransaksi> {
                   ),
                   border: OutlineInputBorder(),
                   filled: true,
-                  contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  contentPadding: EdgeInsets.symmetric(
+                      vertical: 15, horizontal: 10),
                   fillColor: Color.fromARGB(255, 240, 240, 240),
                 ),
               ),
@@ -123,13 +167,15 @@ class _AddTransaksiState extends State<AddTransaksi> {
                   fillColor: const Color.fromARGB(255, 255, 255, 255),
                   filled: true,
                   prefixText: 'Rp. ',
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15, horizontal: 10),
                   enabledBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black, width: 2),
+                    borderSide:
+                        BorderSide(color: Colors.black, width: 2),
                   ),
                   focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF80DEEA), width: 2),
+                    borderSide:
+                        BorderSide(color: Color(0xFF80DEEA), width: 2),
                   ),
                 ),
               ),
@@ -174,7 +220,7 @@ class _AddTransaksiState extends State<AddTransaksi> {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    menuTransaksi();
+                    showConfirmationDialog(); // Panggil dialog konfirmasi sebelum transaksi
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -188,8 +234,9 @@ class _AddTransaksiState extends State<AddTransaksi> {
                   ),
                   child: const Text(
                     'Simpan',
-                    style:
-                        TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+                    style: TextStyle(
+                        color:
+                            Color.fromARGB(255, 255, 255, 255)),
                   ),
                 ),
               ),

@@ -3,6 +3,7 @@ import 'package:app_tiked/screens/User/homeuserscreen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class ListUser extends StatelessWidget {
   const ListUser({super.key});
@@ -63,6 +64,15 @@ class _ListUserScreenState extends State<_ListUserScreen> {
       print(response.data);
 
       getUser();
+
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Sukses',
+        desc: 'Anggota berhasil dihapus!',
+        btnOkOnPress: () {},
+      ).show();
     } on DioError catch (e) {
       print('${e.response} - ${e.response?.statusCode}');
     }
@@ -78,12 +88,26 @@ class _ListUserScreenState extends State<_ListUserScreen> {
   void filterUsers(String query) {
     setState(() {
       filteredUsers = users
-          .where((user) => user['nomor_induk']
-              .toString()
-              .toLowerCase()
-              .contains(query.toLowerCase()))
+          .where((user) =>
+              user['nama'].toString().toLowerCase().contains(query.toLowerCase()) ||
+              user['nomor_induk'].toString().toLowerCase().contains(query.toLowerCase())||
+              user['tgl_lahir'].toString().toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
+  }
+
+  void confirmDeleteUser(int id) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.warning,
+      animType: AnimType.bottomSlide,
+      title: 'Konfirmasi',
+      desc: 'Apakah Anda yakin ingin menghapus anggota ini?',
+      btnCancelOnPress: () {},
+      btnOkOnPress: () {
+        deleteUser(id);
+      },
+    ).show();
   }
 
   @override
@@ -138,7 +162,13 @@ class _ListUserScreenState extends State<_ListUserScreen> {
                           return Card(
                             child: ListTile(
                               title: Text(user['nama']),
-                              subtitle: Text(user['tgl_lahir']),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Nomor Induk: ${user['nomor_induk']}'),
+                                  Text('Tanggal Lahir: ${user['tgl_lahir']}'),
+                                ],
+                              ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -146,18 +176,36 @@ class _ListUserScreenState extends State<_ListUserScreen> {
                                     onPressed: () {
                                       editUser(user);
                                     },
-                                    child: const Text(
-                                      'Edit Anggota',
-                                      style: TextStyle(color: Colors.orange),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Edit',
+                                          style: TextStyle(color: Colors.orange),
+                                        ),
+                                        Text(
+                                          'Anggota',
+                                          style: TextStyle(color: Colors.orange),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      deleteUser(user);
+                                      confirmDeleteUser(user['id']);
                                     },
-                                    child: const Text(
-                                      'Hapus Anggota',
-                                      style: TextStyle(color: Colors.red),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Hapus',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                        Text(
+                                          'Anggota',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
